@@ -1,4 +1,11 @@
 {
-  "name": "AwesomeProject",
-  "displayName": "AwesomeProject"
+  "expo": {
+    "name": "basicRNProject",
+    "slug": "basicRNProject",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "basicRNProject"
 }
