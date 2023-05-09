@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView } from 'react-native';
 
 // export default function App() {
 export default class APp extends React.Component {
@@ -21,10 +21,11 @@ export default class APp extends React.Component {
 	}
 
 	getListInfo() {
-		fetch('http://.1.4/index.json')
+		fetch('http://192.168.1.4/index.json')
+			// http://www.abc.com/index.json
 			.then((res) => res.json())
 			.then((res) => {
-				alert(JSON.stringify(res))
+				// alert(JSON.stringify(res))
 				this.setState({
 					list: res.data.list
 				})
@@ -38,18 +39,24 @@ export default class APp extends React.Component {
 	render() {
 		return (
 			// View 类似 div
-			<View style={styles.container}>
+			<View style={styles.mainContainer}>
+				<View style={styles.inputArea}>
+					<TextInput style={styles.input} placeholder='Input something...' placeholderTextColor='#716f6f'></TextInput>
+				</View>
 				{/* Text 内一定要放文本 */}
-				<Text style={styles.mainTitle}>你好👋</Text>
-				<ScrollView>
-					{
-						this.state.list.map((item, index) => {
-							return (
-								<Text style={styles.todoListItem} key={index}>{item}</Text>
-							)
-						})
-					}
-				</ScrollView>
+				<Text style={styles.mainTitle}>TodoList👋</Text>
+
+				<View style={styles.list}>
+				{/* <ScrollView style={styles.scrollContainer}> */}
+						{
+							this.state.list.map((item, index) => {
+								return (
+									<Text style={[styles.todoItem, styles.todoItemActivated]} key={index}>{item}</Text>
+								)
+							})
+						}
+					{/* </ScrollView> */}
+				</View>
 				<StatusBar style="auto" />
 			</View>
 		)
@@ -57,23 +64,44 @@ export default class APp extends React.Component {
 }
 
 
-//StyleSheet 是构建样式的工具，类似于 CSS 的样式表
+//StyleSheet 是构建样式的工具，类似于 CSS 的样式表, 但本质不是 CSS, 本质是一个 JS 对象
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
+	mainContainer: {
+		marginTop: 44,
+		height: '100%', // 手机的屏幕高度 vh
 		gap: 10,
+		// flexDirection: 'column',//RN 中默认为 column 而不是 row
 		backgroundColor: '#5e4cff',
-		alignItems: 'center',
-		justifyContent: 'center',
+	},
+	inputArea: {
+		height: 60,
+		// backgroundColor: '#e6e4ee',
+	},
+	input: {
+		height: '10%',2
+		lineHeight: 20,
+		fonSize: 116,
+		padding: 10,
+		color: '#333',
+		paddingTop: 30,
+		backgroundColor: '#e6e4ee',
 	},
 	mainTitle: {
 		fontSize: 28,
 		fontWeight: 700,
-		textAlign: 'left',
+		// backgroundColor: 'rgba(102, 102, 102, 0.4)',
 	},
-	todoListItem: {
+	list: {
+		display: 'flex', // 默认为 flex 布局
+		alignItems: 'center',
+		// flex: 1, // 在 css3 中代表 1 1 0, 撑开父级剩余高度',
+		// justifyContent: 'center',
+	},
+	todoItem: {
 		fontSize: 20,
-		textAlign: 'left',
-		lineHeight: 40,
+		backgroundColor: 'rgba(102, 102, 102, 0.4)',
+	},
+	todoItemActivated: {
+		backgroundColor: 'rgba(255, 255, 255, 0)',
 	}
 });
