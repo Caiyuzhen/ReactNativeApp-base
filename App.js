@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView, Button, Keyboard } from 'react-native';
 
 // export default function App() {
 export default class APp extends React.Component {
@@ -8,10 +8,14 @@ export default class APp extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			inputValue: '',
+			inputValue: '', //⚡️保存输入框的内容
 			list: []
 			// list: ['任务一', '任务二', '任务三']
 		}
+
+		// 🔥 绑定 this 的作用域指向
+		this.handleTextChange = this.handleTextChange.bind(this)
+		// this.handleBtnPress = this.handleBtnPress.bind(this)
 	}
 
 
@@ -21,7 +25,7 @@ export default class APp extends React.Component {
 	}
 
 	getListInfo() {
-		fetch('http://192.168.1.4/index.json')
+		fetch('http://1.4/index.json')
 			// http://www.abc.com/index.json
 			.then((res) => res.json())
 			.then((res) => {
@@ -36,13 +40,48 @@ export default class APp extends React.Component {
 	}
 
 
+	// 处理输入框输入事件(🔥注意需要先在上方绑定作用域！)
+	handleTextChange(e) {
+		this.setState({
+			inputValue: e // 输入什么就获取什么内容
+		})
+		// alert(e) //输入什么打印什么
+	}
+
+	handleBtnPress() {
+		this.setState({
+			list: [...this.state.list, this.state.inputValue], //🔥把上一次的内容展开，再加上这一次的内容
+			inputValue: ''//🔥清空输入框
+		})
+		alert(this.state.list)
+		// 关闭底部键盘
+		Keyboard.dismiss()
+		// alert('press')
+	}
+
+
 	render() {
 		return (
 			// View 类似 div
 			<View style={styles.mainContainer}>
 				<View style={styles.inputArea}>
-					<TextInput style={styles.input} placeholder='Input something...' placeholderTextColor='#716f6f'></TextInput>
+					<TextInput 
+						style={styles.input} 
+						placeholder='Input something...' 
+						placeholderTextColor='#716f6f'
+						onChangeText={this.handleTextChange}
+						value={this.state.inputValue} // 把 TextInput 跟 TextInput 做双向数据绑定
+						// RN 中没有 onInput 事件
+					></TextInput>
+					<Button 
+						style={styles.button} title='提交'
+						onPress={ ()=>{this.handleBtnPress()} }// RN 中没有 onClick 事件, 此外箭头函数就不需要绑定 this 了
+					></Button>
 				</View>
+				{/* 👇测试下边输入边获取数据 */}
+				{/* <View>
+					<Text>{this.state.inputValue}</Text>
+				</View> */}
 				{/* Text 内一定要放文本 */}
 				<Text style={styles.mainTitle}>TodoList👋</Text>
 
@@ -70,21 +109,35 @@ const styles = StyleSheet.create({
 		marginTop: 44,
 		height: '100%', // 手机的屏幕高度 vh
 		gap: 10,
-		// flexDirection: 'column',//RN 中默认为 column 而不是 row
+		alignItems: 'center',
 		backgroundColor: '#5e4cff',
+		// flexDirection: 'column',//RN 中默认为 column 而不是 row
 	},
 	inputArea: {
-		height: 60,
+		width: '80%',
+		display: 'flex',
+		flexDirection: 'row', 
+		zIndex: 10,
+		height: 48,
+		borderRadius: 8,
+		marginTop: 40,
+		marginBottom: 20,
+		backgroundColor: '#e6e4ee',
 		// backgroundColor: '#e6e4ee',
 	},
 	input: {
-		height: '10%',2
-		lineHeight: 20,
-		fonSize: 116,
-		padding: 10,
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		lineHeight: 16,
+		fonSize: 16,
+		paddingLeft: 10,
 		color: '#333',
-		paddingTop: 30,
-		backgroundColor: '#e6e4ee',
+		paddingTop: 2,
+		// backgroundColor: '#e6e4ee',
+	},
+	button: {
+		// marginBottom: 20,
 	},
 	mainTitle: {
 		fontSize: 28,
