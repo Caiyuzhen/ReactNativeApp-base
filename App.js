@@ -25,7 +25,7 @@ export default class APp extends React.Component {
 	}
 
 	getListInfo() {
-		fetch('http://1.4/index.json')
+		fetch('http://192.168.1.4/index.json')
 			// http://www.abc.com/index.json
 			.then((res) => res.json())
 			.then((res) => {
@@ -49,10 +49,15 @@ export default class APp extends React.Component {
 	}
 
 	handleBtnPress() {
-		this.setState({
-			list: [...this.state.list, this.state.inputValue], //🔥把上一次的内容展开，再加上这一次的内容
-			inputValue: ''//🔥清空输入框
-		})
+		// 方案二(🔥防止错误, 比较标准的写法, 确保这次的 preState 就是上次的 preState！):
+		this.setState((prevData) => ({
+			list: [...prevData.list, ...prevData.inputValue]
+		}))
+		// 方案一:
+		// this.setState({
+		// 	list: [...this.state.list, this.state.inputValue], //🔥把上一次的内容展开，再加上这一次的内容
+		// 	inputValue: ''//🔥清空输入框
+		// })
 		alert(this.state.list)
 		// 关闭底部键盘
 		Keyboard.dismiss()
@@ -71,12 +76,16 @@ export default class APp extends React.Component {
 						placeholderTextColor='#716f6f'
 						onChangeText={this.handleTextChange}
 						value={this.state.inputValue} // 把 TextInput 跟 TextInput 做双向数据绑定
+						underlineColorAndroid='#fff'//去掉安卓机下的下划线 underlineColorAndroid
+						onBlur={Keyboard.dismiss}
 						// RN 中没有 onInput 事件
 					></TextInput>
-					<Button 
+					<View 
 						style={styles.button} title='提交'
-						onPress={ ()=>{this.handleBtnPress()} }// RN 中没有 onClick 事件, 此外箭头函数就不需要绑定 this 了
-					></Button>
+						// onPress={ ()=>{this.handleBtnPress()} }// RN 中没有 onClick 事件, 此外箭头函数就不需要绑定 this 了
+					>
+						<Text style={styles.btnText}>提交</Text>	
+					</View>
 				</View>
 				{/* 👇测试下边输入边获取数据 */}
 				{/* <View>
@@ -137,7 +146,13 @@ const styles = StyleSheet.create({
 		// backgroundColor: '#e6e4ee',
 	},
 	button: {
-		// marginBottom: 20,
+		marginTop: 16,
+		marginRight: 20,
+	},
+	btnText: {
+		fontSize: 14,
+		fontWeight: 700,
+		color: '#3070FF'
 	},
 	mainTitle: {
 		fontSize: 28,
