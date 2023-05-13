@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, ScrollView, Button, Keyboard, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Keyboard, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, ScrollView, FlatList } from 'react-native';
 
 // export default function App() {
 export default class App extends React.Component {
@@ -27,7 +27,7 @@ export default class App extends React.Component {
 	}
 
 	getListInfo() {
-		fetch('http://.1.4/index.json')
+		fetch('http://19/index.json')
 			// http://www.abc.com/index.json
 			.then((res) => res.json())
 			.then((res) => {
@@ -138,29 +138,49 @@ export default class App extends React.Component {
 							<Text style={styles.btnText}>Send</Text>	
 						</View>
 					</TouchableWithoutFeedback>
-
 				</View>
 
-				<ScrollView style={styles.list}>
-				{/* <ScrollView style={styles.scrollContainer}> */}
-						{
-							this.state.list.map((item, index) => {
-								return (
-									<View style={styles.todoItemContainer} >
-										<Text style={[styles.todoItem, styles.todoItemActivated]}>{item}</Text>
-										{/* 删除按钮 */}
-										<TouchableWithoutFeedback
-											onPress={() => this.handleTodoDelete(index) }//传入 index, 用于删除对应的 item
-										>
-											{/* 内部最好不是直接就是 Text */}
-											<View><Text style={styles.deleteBtn}>删除</Text></View>
-										</TouchableWithoutFeedback>
-									</View>
-								)
-							})
-						}
-					{/* </ScrollView> */}
-				</ScrollView>
+
+				{/* 👇 列表多的话, 使用 ScrollView 会有性能问题, FlatList 性能会更好 ———————————————————————————————————————————————— */}
+				{/* <ScrollView style={styles.list}>  */}
+					{
+						// this.state.list.map((item, index) => {
+						// 	return (
+						// 		<View style={styles.todoItemContainer} key={index}>
+						// 			<Text style={[styles.todoItem, styles.todoItemActivated]}>{item}</Text>
+						// 			<TouchableWithoutFeedback
+						// 				onPress={() => this.handleTodoDelete(index) }//删除按钮: 传入 index, 用于删除对应的 item
+						// 			>
+						// 				{/* 内部最好不要直接就是 Text */}
+						// 				<View><Text style={styles.deleteBtn}>删除</Text></View>
+						// 			</TouchableWithoutFeedback>
+						// 		</View>
+						// 	)
+						// })
+					}
+				{/* </ScrollView> */}
+
+				<FlatList 
+					style={styles.list} 
+					data={this.state.list} 
+					renderItem={ ({item, index})=>{ //item 表示从 list 中解构出每一项 🔥🔥
+						return (
+							<View style={styles.todoItemContainer} >
+									<Text style={[styles.todoItem, styles.todoItemActivated]}>{item}</Text>
+						 			<TouchableWithoutFeedback
+										onPress={() => this.handleTodoDelete(index) }//删除按钮: 传入 index, 用于删除对应的 item
+									>
+										{/* 内部最好不是直接就是 Text */}
+										<View><Text style={styles.deleteBtn}>删除</Text></View>
+									</TouchableWithoutFeedback>
+							</View>
+						)
+					}}
+					keyExtractor={ (item, index)=>{index} } //👈注意: FlatList 组件 key 的写法
+					> 
+				</FlatList>
+			
+
 				<StatusBar style="auto" />
 			</View>
 		)
@@ -172,7 +192,7 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
 	mainContainer: {
 		marginTop: 44,
-		height: '100%', // 手机的屏幕高度 vh
+		// height: '100%', // 手机的屏幕高度 vh
 		gap: 10,
 		alignItems: 'center',
 		backgroundColor: '#5e4cff',
@@ -240,15 +260,19 @@ const styles = StyleSheet.create({
 	},
 	list: {
 		display: 'flex', // 默认为 flex 布局
-		// alignItems: 'center',
+		// 超出部分隐藏
+		overflow: 'hidden',
+		// 自定义高度
+		height: 600,
 		width: '100%',
+		// alignItems: 'center',
 		// flex: 1, // 在 css3 中代表 1 1 0, 撑开父级剩余高度',
 		// justifyContent: 'center',
 	},
 	todoItemContainer: {
 		display: 'flex',
 		flexDirection: 'row',
-		// 两头对齐顶边对齐
+		height: 'auto',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		width: '100%',
